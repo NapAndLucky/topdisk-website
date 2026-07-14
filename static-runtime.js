@@ -1,6 +1,7 @@
 (function () {
   const q = (selector, root = document) => root.querySelector(selector);
   const qa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const isZh = location.pathname.includes("/zh/");
   const pageKey = `topdisk-pages-edit:${location.pathname}`;
 
   function toast(message) {
@@ -36,11 +37,12 @@
       menu?.classList.toggle("open", open);
       menuButton.setAttribute("aria-expanded", String(open));
     });
-    q(".lang")?.addEventListener("click", event => {
-      const button = event.currentTarget;
-      const next = button.textContent.trim().startsWith("EN") ? "中文" : "EN";
-      button.innerHTML = `${next} <span>⌄</span>`;
-      toast(next === "中文" ? "中文内容将在正式内容阶段补齐" : "Language switched to English");
+    q(".lang")?.addEventListener("click", () => {
+      const base = "/topdisk-website";
+      const targetPath = isZh
+        ? location.pathname.replace(`${base}/zh`, base)
+        : location.pathname.replace(base, `${base}/zh`);
+      location.assign(`${targetPath}${location.search}${location.hash}`);
     });
   }
 
@@ -49,26 +51,30 @@
     const wrap = document.createElement("div");
     wrap.id = "static-quote-modal";
     wrap.className = "modal-backdrop";
-    wrap.innerHTML = `<div class="quote-modal" role="dialog" aria-modal="true"><button class="modal-close" aria-label="Close">×</button><span class="eyebrow">PROJECT INQUIRY</span><h2>${mode}</h2><p>Fields marked * help us route your request faster.</p><form><div class="form-row"><label>Work email *<input type="email" placeholder="name@company.com" required></label><label>Company *<input placeholder="Company name" required></label></div><div class="form-row"><label>Product interest *<select required><option value="">Select a product</option><option>SSD</option><option>USB Flash Drive</option><option>MicroSD Card</option><option>SD NAND / Embedded</option><option>Not sure yet</option></select></label><label>Project stage<select><option>Concept / Evaluation</option><option>Sample validation</option><option>Pilot run</option><option>Mass production</option></select></label></div><label>Project requirement *<textarea required placeholder="Application, capacity, interface, target quantity, schedule, customization..."></textarea></label><label class="check"><input type="checkbox" required><span>I agree to be contacted about this project inquiry.</span></label><button class="btn btn-red form-submit" type="submit">Submit requirement <span>↗</span></button></form></div>`;
+    wrap.innerHTML = isZh
+      ? `<div class="quote-modal" role="dialog" aria-modal="true"><button class="modal-close" aria-label="关闭">×</button><span class="eyebrow">项目咨询</span><h2>${mode}</h2><p>标记 * 的信息有助于我们更快分配您的需求。</p><form><div class="form-row"><label>工作邮箱 *<input type="email" placeholder="name@company.com" required></label><label>公司名称 *<input placeholder="公司名称" required></label></div><div class="form-row"><label>感兴趣的产品 *<select required><option value="">请选择产品</option><option>SSD</option><option>USB 闪存盘</option><option>MicroSD 卡</option><option>SD NAND / 嵌入式存储</option><option>暂不确定</option></select></label><label>项目阶段<select><option>概念 / 评估</option><option>样品验证</option><option>试产</option><option>量产</option></select></label></div><label>项目需求 *<textarea required placeholder="应用、容量、接口、目标数量、时间计划、定制需求……"></textarea></label><label class="check"><input type="checkbox" required><span>我同意 TOPDISK 就本项目需求与我联系。</span></label><button class="btn btn-red form-submit" type="submit">提交需求 <span>↗</span></button></form></div>`
+      : `<div class="quote-modal" role="dialog" aria-modal="true"><button class="modal-close" aria-label="Close">×</button><span class="eyebrow">PROJECT INQUIRY</span><h2>${mode}</h2><p>Fields marked * help us route your request faster.</p><form><div class="form-row"><label>Work email *<input type="email" placeholder="name@company.com" required></label><label>Company *<input placeholder="Company name" required></label></div><div class="form-row"><label>Product interest *<select required><option value="">Select a product</option><option>SSD</option><option>USB Flash Drive</option><option>MicroSD Card</option><option>SD NAND / Embedded</option><option>Not sure yet</option></select></label><label>Project stage<select><option>Concept / Evaluation</option><option>Sample validation</option><option>Pilot run</option><option>Mass production</option></select></label></div><label>Project requirement *<textarea required placeholder="Application, capacity, interface, target quantity, schedule, customization..."></textarea></label><label class="check"><input type="checkbox" required><span>I agree to be contacted about this project inquiry.</span></label><button class="btn btn-red form-submit" type="submit">Submit requirement <span>↗</span></button></form></div>`;
     document.body.appendChild(wrap);
     const close = () => wrap.remove();
     q(".modal-close", wrap).addEventListener("click", close);
     wrap.addEventListener("click", event => { if (event.target === wrap) close(); });
     q("form", wrap).addEventListener("submit", event => {
       event.preventDefault();
-      q(".quote-modal", wrap).innerHTML = `<div class="success-state"><span>✓</span><h2>Requirement received.</h2><p>This is a prototype confirmation. The final website can connect this form to email, CRM or your inquiry system.</p><button class="btn btn-dark">Close</button></div>`;
+      q(".quote-modal", wrap).innerHTML = isZh
+        ? `<div class="success-state"><span>✓</span><h2>需求已收到。</h2><p>这是原型确认提示，正式网站可将表单连接至邮箱、CRM 或询价系统。</p><button class="btn btn-dark">关闭</button></div>`
+        : `<div class="success-state"><span>✓</span><h2>Requirement received.</h2><p>This is a prototype confirmation. The final website can connect this form to email, CRM or your inquiry system.</p><button class="btn btn-dark">Close</button></div>`;
       q("button", wrap).addEventListener("click", close);
     });
   }
 
   function bindQuoteActions() {
-    const patterns = ["Get a Quote", "Request Sample", "Contact Sales", "Submit Project Requirement", "Request Quote", "Start solution matching", "Discuss your project", "Contact our team", "sales@topdisk.com"];
+    const patterns = ["Get a Quote", "Request Sample", "Contact Sales", "Submit Project Requirement", "Request Quote", "Start solution matching", "Discuss your project", "Contact our team", "获取报价", "申请样品", "联系销售", "提交项目需求", "开始方案匹配", "讨论您的项目", "联系我们的团队", "sales@topdisk.com"];
     qa("button").forEach(button => {
       const text = button.textContent.trim();
       if (patterns.some(pattern => text.includes(pattern))) button.addEventListener("click", () => openQuote(text.replace("↗", "").trim()));
     });
-    q(".download-btn")?.addEventListener("click", () => toast("Datasheet PDF will be connected in the final content phase"));
-    q(".play")?.addEventListener("click", () => toast("Company video placeholder"));
+    q(".download-btn")?.addEventListener("click", () => toast(isZh ? "正式内容阶段将接入规格书 PDF" : "Datasheet PDF will be connected in the final content phase"));
+    q(".play")?.addEventListener("click", () => toast(isZh ? "企业视频占位区域" : "Company video placeholder"));
   }
 
   function bindProducts() {
@@ -76,13 +82,14 @@
     if (!cards.length) return;
     const input = q(".search-box input");
     const categories = qa(".filter-group button");
-    let active = "All Products";
+    const allProducts = isZh ? "全部产品" : "All Products";
+    let active = allProducts;
     function update() {
       const query = (input?.value || "").trim().toLowerCase();
       let count = 0;
       cards.forEach(card => {
         const text = card.textContent.toLowerCase();
-        const category = active === "All Products" || text.includes(active.toLowerCase().replace(" card", ""));
+        const category = active === allProducts || text.includes(active.toLowerCase().replace(" card", ""));
         const match = !query || text.includes(query);
         card.style.display = category && match ? "" : "none";
         if (category && match) count++;
@@ -97,7 +104,7 @@
     }));
     input?.addEventListener("input", update);
     q(".filter-title button")?.addEventListener("click", () => {
-      active = "All Products";
+      active = allProducts;
       if (input) input.value = "";
       categories.forEach((item, index) => item.classList.toggle("active", index === 0));
       update();
@@ -106,12 +113,18 @@
       button.classList.toggle("active");
       const mark = q("span", button);
       if (mark) mark.textContent = button.classList.contains("active") ? "−" : "＋";
-      toast("Detailed filter options are reserved for the formal product database");
+      toast(isZh ? "详细筛选项将在正式产品数据库阶段接入" : "Detailed filter options are reserved for the formal product database");
     }));
   }
 
   function bindIndustries() {
-    const data = [
+    const data = isZh ? [
+      ["01", "为持续联网设备提供紧凑存储与稳定生命周期支持。", "SD NAND · eMMC · MicroSD"],
+      ["02", "面向连续录像与边缘智能的持续写入耐久能力。", "高耐久 MicroSD · SSD"],
+      ["03", "为严苛环境提供宽温选项与受控 BOM。", "工业级 SSD · 嵌入式存储"],
+      ["04", "为网关、路由器与边缘节点提供可靠启动和数据存储。", "M.2 SSD · SD NAND"],
+      ["05", "通过灵活容量、产品标识与包装支持全球产品上市。", "USB · MicroSD · SSD"],
+    ] : [
       ["01", "Compact storage with stable lifecycle support for always-connected devices.", "SD NAND · eMMC · MicroSD"],
       ["02", "Sustained write endurance for continuous recording and edge intelligence.", "High-endurance MicroSD · SSD"],
       ["03", "Wide-temperature options and controlled BOM for demanding environments.", "Industrial SSD · Embedded"],
@@ -127,7 +140,7 @@
       if (art) {
         art.className = `industry-art art-${index}`;
         const label = q(":scope > span", art);
-        if (label) label.textContent = `APPLICATION / ${data[index][0]}`;
+        if (label) label.textContent = `${isZh ? "应用" : "APPLICATION"} / ${data[index][0]}`;
       }
       const copy = qa(".industry-caption p");
       if (copy[0]) copy[0].textContent = data[index][1];
@@ -140,7 +153,7 @@
     const heading = q(".detail-content h2");
     tabs.forEach(button => button.addEventListener("click", () => {
       tabs.forEach(item => item.classList.toggle("active", item === button));
-      if (heading) heading.textContent = button.textContent === "Overview" ? "Performance you can design around." : button.textContent;
+      if (heading) heading.textContent = button.textContent === (isZh ? "概述" : "Overview") ? (isZh ? "可纳入产品设计的稳定性能。" : "Performance you can design around.") : button.textContent;
     }));
     const dots = qa(".gallery-dots button");
     dots.forEach(dot => dot.addEventListener("click", () => dots.forEach(item => item.classList.toggle("active", item === dot))));
