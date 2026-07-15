@@ -26,3 +26,19 @@
   .factory-copy .btn-white span:before{content:"";position:absolute;width:12px;height:2px;background:#fff;left:10px;top:15px;transform:rotate(-45deg)}
   .factory-copy .btn-white span:after{content:"";position:absolute;width:7px;height:7px;border-top:2px solid #fff;border-right:2px solid #fff;right:8px;top:8px}
 }
+
+/* Mobile hero composition v3 */
+@media(max-width:700px){
+  .hero-stage{height:180px;margin-top:28px}
+  .hero-stage .hero-card{background:transparent;box-shadow:none}
+  .hero-stage .product-visual{background:transparent}
+  .hero-stage .product-visual .grid-lines{display:none}
+  .card-ssd{width:68%;height:72%;left:-2%;top:14%;transform:rotate(-2deg)}
+  .card-micro{width:34%;height:62%;right:0;top:18%}
+  .hero-stage .tech-chip,.hero-stage .stage-note{display:none}
+  .hero-stage .card-micro .device-brand{font-size:8px;white-space:nowrap}
+  .hero-stage .card-micro .device-code{display:none}
+  .hero .btn-dark span{font-size:0;flex:0 0 28px;width:28px;height:28px;background:#2c2e32;position:relative}
+  .hero .btn-dark span:before{content:"";position:absolute;width:11px;height:2px;background:#fff;left:8px;top:13px;transform:rotate(-45deg)}
+  .hero .btn-dark span:after{content:"";position:absolute;width:6px;height:6px;border-top:2px solid #fff;border-right:2px solid #fff;right:7px;top:7px}
+}
